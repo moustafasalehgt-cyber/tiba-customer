@@ -133,16 +133,37 @@
 
 <div class="wrap">
 
+  <!-- مسؤول المبيعات -->
+  <div class="card">
+    <h2><span class="n">1</span> مسؤول المبيعات بشركة طيبة</h2>
+    <div class="field">
+      <label class="req" for="salesRep">اسم مسؤول المبيعات</label>
+      <select id="salesRep">
+        <option value="">— اختر مسؤول المبيعات —</option>
+        <option>عماد شاكر</option>
+        <option>مرسى هاشم</option>
+        <option>محمد نبيل</option>
+        <option>باسم نبيل</option>
+        <option>هيثم العدلى</option>
+        <option>مصطفى الرشيدي</option>
+        <option>هيثم عصام</option>
+        <option>صبرى سعد</option>
+        <option>الفرع</option>
+        <option>مصطفى صالح</option>
+      </select>
+    </div>
+  </div>
+
   <!-- بيانات المحل -->
   <div class="card">
-    <h2><span class="n">1</span> بيانات المحل والمسؤول</h2>
+    <h2><span class="n">2</span> بيانات المحل والمسؤول</h2>
     <div class="field">
       <label class="req" for="shopName">اسم المحل</label>
       <input type="text" id="shopName" placeholder="اكتب اسم المحل">
     </div>
     <div class="field">
-      <label class="req" for="personName">اسم الشخص المسؤول</label>
-      <input type="text" id="personName" placeholder="اسم المسؤول">
+      <label class="req" for="personName">اسم الشخص المسؤول في المحل</label>
+      <input type="text" id="personName" placeholder="اسم المسؤول في المحل">
     </div>
     <div class="row">
       <div class="field">
@@ -162,7 +183,7 @@
 
   <!-- الموقع الجغرافي -->
   <div class="card">
-    <h2><span class="n">2</span> المحافظة والمنطقة</h2>
+    <h2><span class="n">3</span> المحافظة والمنطقة</h2>
     <div class="field">
       <label class="req" for="gov">المحافظة</label>
       <select id="gov"><option value="">— اختر المحافظة —</option></select>
@@ -185,19 +206,24 @@
 
   <!-- اللوكيشن -->
   <div class="card">
-    <h2><span class="n">3</span> لوكيشن العميل على الخريطة</h2>
+    <h2><span class="n">4</span> لوكيشن العميل على الخريطة</h2>
     <button type="button" class="btn btn-loc" id="locBtn" onclick="getLocation()">
       📍 تسجيل اللوكيشن الحالي
     </button>
     <div class="loc-info" id="locInfo">اضغط الزر وانت واقف عند المحل لتسجيل الإحداثيات</div>
+    <div class="field" style="margin-top:14px;">
+      <label for="mapLink">أو الصق لينك موقع العميل (اختياري)</label>
+      <input type="text" id="mapLink" placeholder="https://maps.google.com/..." dir="ltr" style="text-align:left;">
+      <div class="hint">لو معاك لينك جوجل ماب جاهز للعميل، الصقه هنا</div>
+    </div>
   </div>
 
   <!-- صورة الكارت -->
   <div class="card">
-    <h2><span class="n">4</span> صورة كارت المحل</h2>
-    <input type="file" id="imgInput" accept="image/*" capture="environment" style="display:none" onchange="handleImage(event)">
+    <h2><span class="n">5</span> صورة كارت المحل</h2>
+    <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImage(event)">
     <button type="button" class="btn btn-img" id="imgBtn" onclick="document.getElementById('imgInput').click()">
-      📷 التقاط / اختيار صورة الكارت
+      📷 صورة الكارت (كاميرا أو جاليري)
     </button>
     <div id="imgPreview">
       <img id="imgTag" alt="معاينة الكارت">
@@ -207,7 +233,7 @@
 
   <!-- التصنيف -->
   <div class="card">
-    <h2><span class="n">5</span> تصنيف التاجر</h2>
+    <h2><span class="n">6</span> تصنيف التاجر</h2>
     <div class="chips" id="traderType">
       <div class="chip"><input type="checkbox" id="t1" value="جملة"><label for="t1">جملة</label></div>
       <div class="chip"><input type="checkbox" id="t2" value="تجزئة - فئة عالية"><label for="t2">تجزئة - فئة عالية</label></div>
@@ -219,7 +245,7 @@
 
   <!-- بيانات تجارية -->
   <div class="card">
-    <h2><span class="n">6</span> بيانات تجارية</h2>
+    <h2><span class="n">7</span> بيانات تجارية</h2>
 
     <div class="field">
       <label>التاجر يحتاج زجاج؟</label>
@@ -255,7 +281,7 @@
 
   <!-- ملاحظات هامة -->
   <div class="card">
-    <h2><span class="n">7</span> ملاحظات هامة</h2>
+    <h2><span class="n">8</span> ملاحظات هامة</h2>
     <div class="field">
       <label for="notes">ملاحظات عن العميل</label>
       <textarea id="notes" placeholder="أي ملاحظة مهمة عن التاجر أو التعامل معه" style="min-height:90px;"></textarea>
@@ -377,7 +403,7 @@ function removeImage(){
   imgData="";document.getElementById('imgInput').value="";
   document.getElementById('imgPreview').style.display='none';
   document.getElementById('imgBtn').classList.remove('done');
-  document.getElementById('imgBtn').innerHTML='📷 التقاط / اختيار صورة الكارت';
+  document.getElementById('imgBtn').innerHTML='📷 صورة الكارت (كاميرا أو جاليري)';
 }
 
 /* ---------- الإرسال ---------- */
@@ -389,17 +415,20 @@ function toast(msg,type){
 function getChecked(){return [...document.querySelectorAll('#traderType input:checked')].map(c=>c.value).join('، ');}
 
 function submitForm(){
+  const salesRep=document.getElementById('salesRep').value;
   const shop=document.getElementById('shopName').value.trim();
   const person=document.getElementById('personName').value.trim();
   const phone1=document.getElementById('phone1').value.trim();
+  if(!salesRep){toast('من فضلك اختر مسؤول المبيعات','err');return;}
   if(!shop){toast('من فضلك اكتب اسم المحل','err');return;}
-  if(!person){toast('من فضلك اكتب اسم المسؤول','err');return;}
+  if(!person){toast('من فضلك اكتب اسم المسؤول في المحل','err');return;}
   if(!phone1){toast('من فضلك اكتب تليفون المسؤول','err');return;}
 
   const glassEl=document.querySelector('input[name=glass]:checked');
   const data={
+    "مسؤول المبيعات":salesRep,
     "اسم المحل":shop,
-    "اسم المسؤول":person,
+    "اسم المسؤول في المحل":person,
     "تليفون المسؤول":phone1,
     "تليفون 2":document.getElementById('phone2').value.trim(),
     "تليفونات أخرى":document.getElementById('phoneOther').value.trim(),
@@ -409,7 +438,7 @@ function submitForm(){
     "العنوان التفصيلي":document.getElementById('address').value.trim(),
     "Latitude":geo.lat,
     "Longitude":geo.lng,
-    "رابط الخريطة":geo.lat?`https://www.google.com/maps?q=${geo.lat},${geo.lng}`:"",
+    "رابط الخريطة":geo.lat?`https://www.google.com/maps?q=${geo.lat},${geo.lng}`:document.getElementById('mapLink').value.trim(),
     "تصنيف التاجر":getChecked(),
     "يحتاج زجاج":glassEl?glassEl.value:"",
     "حجم شركتنا لدى التاجر":document.getElementById('ourSize').value,
