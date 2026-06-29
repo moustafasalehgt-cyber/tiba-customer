@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحديث بيانات العملاء — مجموعة طيبة للعطور</title>
+<style>
+  :root{
+    --navy:#0f2747;
+    --navy-2:#1a3a63;
+    --gold:#c9a14a;
+    --gold-soft:#e3c982;
+    --bg:#f4f1ea;
+    --card:#ffffff;
+    --line:#dcd6c8;
+    --txt:#1c2433;
+    --muted:#6b7280;
+    --ok:#1f8a4c;
+    --err:#c0392b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.6;
+    padding-bottom:90px;
+  }
+  header{
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    color:#fff;padding:18px 18px;
+    border-bottom:3px solid var(--gold);
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;justify-content:center;gap:14px;
+  }
+  header .htext{text-align:right;}
+  header .logo{width:58px;height:auto;flex:0 0 auto;filter:drop-shadow(0 2px 5px rgba(0,0,0,.25));}
+  header h1{margin:0;font-size:20px;letter-spacing:.3px;}
+  header p{margin:4px 0 0;font-size:13px;color:var(--gold-soft);}
+  .wrap{max-width:640px;margin:18px auto;padding:0 14px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:18px;margin-bottom:16px;
+    box-shadow:0 2px 10px rgba(15,39,71,.05);
+  }
+  .card h2{
+    margin:0 0 14px;font-size:15px;color:var(--navy);
+    display:flex;align-items:center;gap:8px;
+    padding-bottom:10px;border-bottom:1px dashed var(--line);
+  }
+  .card h2 .n{
+    background:var(--gold);color:#fff;width:24px;height:24px;
+    border-radius:7px;display:grid;place-items:center;font-size:13px;flex:0 0 auto;
+  }
+  label{display:block;font-size:13px;font-weight:600;margin:0 0 6px;color:var(--navy);}
+  .req::after{content:" *";color:var(--err);}
+  input[type=text],input[type=tel],select,textarea{
+    width:100%;padding:12px 12px;font-size:15px;font-family:inherit;
+    border:1px solid var(--line);border-radius:10px;background:#fdfcf9;color:var(--txt);
+    transition:border-color .15s,box-shadow .15s;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,161,74,.18);
+  }
+  textarea{resize:vertical;min-height:70px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;}
+  .row .field{flex:1;min-width:140px;}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+  /* checkboxes / radios as chips */
+  .chips{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{position:relative;}
+  .chip input{position:absolute;opacity:0;pointer-events:none;}
+  .chip label{
+    display:block;margin:0;padding:9px 14px;border:1px solid var(--line);
+    border-radius:30px;font-size:13.5px;font-weight:600;cursor:pointer;
+    background:#fdfcf9;color:var(--txt);user-select:none;transition:.15s;
+  }
+  .chip input:checked + label{
+    background:var(--navy);color:#fff;border-color:var(--navy);
+  }
+  .chip.gold input:checked + label{background:var(--gold);border-color:var(--gold);}
+
+  /* location + image buttons */
+  .btn{
+    width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;
+    font-weight:700;font-family:inherit;cursor:pointer;display:flex;
+    align-items:center;justify-content:center;gap:9px;transition:.15s;
+  }
+  .btn-loc{background:#eaf3ff;color:#1457a8;border:1.5px solid #b9d6ff;}
+  .btn-loc:active{background:#dceaff;}
+  .btn-loc.done{background:#e7f6ec;color:var(--ok);border-color:#a8e0bd;}
+  .btn-img{background:#fdf6e6;color:#8a6a17;border:1.5px solid var(--gold-soft);}
+  .btn-img.done{background:#e7f6ec;color:var(--ok);border-color:#a8e0bd;}
+  .loc-info{font-size:12.5px;color:var(--muted);margin-top:8px;text-align:center;}
+  .loc-info a{color:#1457a8;font-weight:600;}
+  #imgPreview{margin-top:12px;text-align:center;display:none;}
+  #imgPreview img{max-width:100%;max-height:220px;border-radius:10px;border:1px solid var(--line);}
+  .removeImg{margin-top:8px;background:none;border:none;color:var(--err);font-size:13px;font-weight:600;cursor:pointer;}
+
+  .submitbar{
+    position:fixed;bottom:0;left:0;right:0;background:#fff;
+    border-top:1px solid var(--line);padding:12px 14px;z-index:30;
+    box-shadow:0 -3px 14px rgba(0,0,0,.06);
+  }
+  .submitbar .inner{max-width:640px;margin:0 auto;}
+  .btn-submit{background:var(--gold);color:#fff;font-size:16px;}
+  .btn-submit:active{background:#b78f37;}
+  .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+
+  .toast{
+    position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-120%);
+    background:var(--navy);color:#fff;padding:13px 20px;border-radius:12px;
+    font-size:14px;font-weight:600;z-index:50;transition:transform .3s;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90%;text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.ok{background:var(--ok);}
+  .toast.err{background:var(--err);}
+  .spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:r .7s linear infinite;}
+  @keyframes r{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <img src="data:image/png;base64,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" alt="طيبة" class="logo">
+  <div class="htext">
+    <h1>تحديث بيانات العملاء</h1>
+    <p>مجموعة طيبة للعطور</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- بيانات المحل -->
+  <div class="card">
+    <h2><span class="n">1</span> بيانات المحل والمسؤول</h2>
+    <div class="field">
+      <label class="req" for="shopName">اسم المحل</label>
+      <input type="text" id="shopName" placeholder="اكتب اسم المحل">
+    </div>
+    <div class="field">
+      <label class="req" for="personName">اسم الشخص المسؤول</label>
+      <input type="text" id="personName" placeholder="اسم المسؤول">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label class="req" for="phone1">تليفون المسؤول</label>
+        <input type="tel" id="phone1" placeholder="01xxxxxxxxx" inputmode="tel">
+      </div>
+      <div class="field">
+        <label for="phone2">تليفون 2 للمسؤول</label>
+        <input type="tel" id="phone2" placeholder="اختياري" inputmode="tel">
+      </div>
+    </div>
+    <div class="field">
+      <label for="phoneOther">تليفونات أخرى</label>
+      <input type="text" id="phoneOther" placeholder="افصل بينهم بفاصلة">
+    </div>
+  </div>
+
+  <!-- الموقع الجغرافي -->
+  <div class="card">
+    <h2><span class="n">2</span> المحافظة والمنطقة</h2>
+    <div class="field">
+      <label class="req" for="gov">المحافظة</label>
+      <select id="gov"><option value="">— اختر المحافظة —</option></select>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="city">المدينة</label>
+        <select id="city"><option value="">— اختر المحافظة أولاً —</option></select>
+      </div>
+      <div class="field">
+        <label for="markaz">المركز / الحي</label>
+        <select id="markaz"><option value="">— اختر المدينة أولاً —</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="address">العنوان بالتفصيل وعلامات مميزة</label>
+      <textarea id="address" placeholder="الشارع، رقم العقار، وأقرب علامة مميزة بجوار المكان"></textarea>
+    </div>
+  </div>
+
+  <!-- اللوكيشن -->
+  <div class="card">
+    <h2><span class="n">3</span> لوكيشن العميل على الخريطة</h2>
+    <button type="button" class="btn btn-loc" id="locBtn" onclick="getLocation()">
+      📍 تسجيل اللوكيشن الحالي
+    </button>
+    <div class="loc-info" id="locInfo">اضغط الزر وانت واقف عند المحل لتسجيل الإحداثيات</div>
+  </div>
+
+  <!-- صورة الكارت -->
+  <div class="card">
+    <h2><span class="n">4</span> صورة كارت المحل</h2>
+    <input type="file" id="imgInput" accept="image/*" capture="environment" style="display:none" onchange="handleImage(event)">
+    <button type="button" class="btn btn-img" id="imgBtn" onclick="document.getElementById('imgInput').click()">
+      📷 التقاط / اختيار صورة الكارت
+    </button>
+    <div id="imgPreview">
+      <img id="imgTag" alt="معاينة الكارت">
+      <div><button type="button" class="removeImg" onclick="removeImage()">✕ حذف الصورة</button></div>
+    </div>
+  </div>
+
+  <!-- التصنيف -->
+  <div class="card">
+    <h2><span class="n">5</span> تصنيف التاجر</h2>
+    <div class="chips" id="traderType">
+      <div class="chip"><input type="checkbox" id="t1" value="جملة"><label for="t1">جملة</label></div>
+      <div class="chip"><input type="checkbox" id="t2" value="تجزئة - فئة عالية"><label for="t2">تجزئة - فئة عالية</label></div>
+      <div class="chip"><input type="checkbox" id="t3" value="تجزئة - فئة متوسطة"><label for="t3">تجزئة - فئة متوسطة</label></div>
+      <div class="chip"><input type="checkbox" id="t4" value="تجزئة - فئة شعبية"><label for="t4">تجزئة - فئة شعبية</label></div>
+      <div class="chip"><input type="checkbox" id="t5" value="صناعي"><label for="t5">صناعي</label></div>
+    </div>
+  </div>
+
+  <!-- بيانات تجارية -->
+  <div class="card">
+    <h2><span class="n">6</span> بيانات تجارية</h2>
+
+    <div class="field">
+      <label>التاجر يحتاج زجاج؟</label>
+      <div class="chips gold">
+        <div class="chip gold"><input type="radio" name="glass" id="g1" value="نعم"><label for="g1">نعم</label></div>
+        <div class="chip gold"><input type="radio" name="glass" id="g2" value="لا"><label for="g2">لا</label></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="ourSize">حجم شركتنا بالنسبة للشركات الأخرى لدى التاجر</label>
+      <select id="ourSize">
+        <option value="">— اختر —</option>
+        <option>المورد الأساسي (الأكبر)</option>
+        <option>من أكبر 3 موردين</option>
+        <option>مورد متوسط</option>
+        <option>مورد صغير / ثانوي</option>
+        <option>لا يتعامل معنا حالياً</option>
+      </select>
+    </div>
+
+    <label style="margin-bottom:8px;">أعلى سحب كميات من شركات أخرى (أهم شركتين)</label>
+    <div class="row">
+      <div class="field">
+        <input type="text" id="comp1" placeholder="الشركة المنافسة الأولى">
+      </div>
+      <div class="field">
+        <input type="text" id="comp2" placeholder="الشركة المنافسة الثانية">
+      </div>
+    </div>
+    <div class="hint">اكتب الشركتين الأعلى سحباً لدى التاجر</div>
+  </div>
+
+  <!-- ملاحظات هامة -->
+  <div class="card">
+    <h2><span class="n">7</span> ملاحظات هامة</h2>
+    <div class="field">
+      <label for="notes">ملاحظات عن العميل</label>
+      <textarea id="notes" placeholder="أي ملاحظة مهمة عن التاجر أو التعامل معه" style="min-height:90px;"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<div class="submitbar">
+  <div class="inner">
+    <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitForm()">
+      💾 حفظ البيانات على Google Sheet
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================================================================
+   ضع هنا رابط الـ Web App بعد نشر Google Apps Script (موضح في الخطوات)
+   ==================================================================== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtYgthXcd2rtRDnDbCI1Ic_Qzrd5mmLIf_qnnRzR7ou1ItxlY2ZDMmoYuuawKkv73s/exec";
+
+/* ---------- بيانات المحافظات والمدن والمراكز ---------- */
+const EGYPT = {
+  "القاهرة":{ "وسط القاهرة":["عابدين","الموسكي","الأزبكية","باب الشعرية","الجمالية"],
+    "شرق القاهرة":["النزهة","مصر الجديدة","مدينة نصر","عين شمس","المطرية"],
+    "غرب القاهرة":["الوايلي","بولاق","الزاوية الحمراء","الشرابية"],
+    "جنوب القاهرة":["المعادي","المعصرة","حلوان","البساتين","دار السلام","مصر القديمة","السيدة زينب","الخليفة"],
+    "القاهرة الجديدة":["التجمع الخامس","الرحاب","مدينتي"]},
+  "الجيزة":{ "الجيزة":["الدقي","العجوزة","الجيزة","الهرم","فيصل","بولاق الدكرور"],
+    "6 أكتوبر":["6 أكتوبر","الشيخ زايد","حدائق أكتوبر"],
+    "البدرشين":["البدرشين"],"العياط":["العياط"],"أوسيم":["أوسيم"],"كرداسة":["كرداسة"],"الصف":["الصف"],"أطفيح":["أطفيح"]},
+  "الإسكندرية":{ "الإسكندرية":["المنتزه","شرق","وسط","غرب","الجمرك","العامرية","برج العرب","المنتزه أول","العطارين","محرم بك","سيدي جابر","الرمل"]},
+  "القليوبية":{ "بنها":["بنها"],"شبرا الخيمة":["شبرا الخيمة","الخصوص"],"قليوب":["قليوب"],"القناطر الخيرية":["القناطر الخيرية"],"الخانكة":["الخانكة"],"كفر شكر":["كفر شكر"],"طوخ":["طوخ"],"قها":["قها"],"العبور":["العبور"],"شبين القناطر":["شبين القناطر"]},
+  "الدقهلية":{ "المنصورة":["المنصورة","طلخا"],"ميت غمر":["ميت غمر"],"دكرنس":["دكرنس"],"أجا":["أجا"],"منية النصر":["منية النصر"],"السنبلاوين":["السنبلاوين"],"بلقاس":["بلقاس"],"شربين":["شربين"],"المطرية":["المطرية"],"تمي الأمديد":["تمي الأمديد"],"الجمالية":["الجمالية"],"نبروه":["نبروه"]},
+  "الشرقية":{ "الزقازيق":["الزقازيق"],"العاشر من رمضان":["العاشر من رمضان"],"بلبيس":["بلبيس"],"منيا القمح":["منيا القمح"],"أبو حماد":["أبو حماد"],"فاقوس":["فاقوس"],"ههيا":["ههيا"],"أبو كبير":["أبو كبير"],"كفر صقر":["كفر صقر"],"ديرب نجم":["ديرب نجم"],"الإبراهيمية":["الإبراهيمية"],"مشتول السوق":["مشتول السوق"],"الحسينية":["الحسينية"]},
+  "الغربية":{ "طنطا":["طنطا"],"المحلة الكبرى":["المحلة الكبرى"],"كفر الزيات":["كفر الزيات"],"زفتى":["زفتى"],"السنطة":["السنطة"],"بسيون":["بسيون"],"سمنود":["سمنود"],"قطور":["قطور"]},
+  "المنوفية":{ "شبين الكوم":["شبين الكوم"],"منوف":["منوف"],"أشمون":["أشمون"],"الباجور":["الباجور"],"قويسنا":["قويسنا"],"بركة السبع":["بركة السبع"],"تلا":["تلا"],"الشهداء":["الشهداء"],"السادات":["السادات"]},
+  "البحيرة":{ "دمنهور":["دمنهور"],"كفر الدوار":["كفر الدوار"],"رشيد":["رشيد"],"إدكو":["إدكو"],"أبو حمص":["أبو حمص"],"الدلنجات":["الدلنجات"],"المحمودية":["المحمودية"],"الرحمانية":["الرحمانية"],"إيتاي البارود":["إيتاي البارود"],"حوش عيسى":["حوش عيسى"],"شبراخيت":["شبراخيت"],"كوم حمادة":["كوم حمادة"],"بدر":["بدر"],"وادي النطرون":["وادي النطرون"],"النوبارية":["النوبارية"]},
+  "كفر الشيخ":{ "كفر الشيخ":["كفر الشيخ"],"دسوق":["دسوق"],"فوه":["فوه"],"مطوبس":["مطوبس"],"بلطيم":["بلطيم"],"الحامول":["الحامول"],"بيلا":["بيلا"],"الرياض":["الرياض"],"سيدي سالم":["سيدي سالم"],"قلين":["قلين"],"البرلس":["البرلس"]},
+  "دمياط":{ "دمياط":["دمياط"],"رأس البر":["رأس البر"],"فارسكور":["فارسكور"],"كفر سعد":["كفر سعد"],"الزرقا":["الزرقا"],"السرو":["السرو"],"الروضة":["الروضة"],"كفر البطيخ":["كفر البطيخ"],"عزبة البرج":["عزبة البرج"],"ميت أبو غالب":["ميت أبو غالب"]},
+  "بورسعيد":{ "بورسعيد":["بورسعيد","بورفؤاد","العرب","المناخ","الضواحي","الزهور","الشرق","الجنوب"]},
+  "الإسماعيلية":{ "الإسماعيلية":["الإسماعيلية"],"فايد":["فايد"],"القنطرة شرق":["القنطرة شرق"],"القنطرة غرب":["القنطرة غرب"],"التل الكبير":["التل الكبير"],"أبو صوير":["أبو صوير"],"القصاصين":["القصاصين"]},
+  "السويس":{ "السويس":["السويس","الأربعين","عتاقة","الجناين","فيصل"]},
+  "الفيوم":{ "الفيوم":["الفيوم"],"سنورس":["سنورس"],"إطسا":["إطسا"],"طامية":["طامية"],"يوسف الصديق":["يوسف الصديق"],"إبشواي":["إبشواي"]},
+  "بني سويف":{ "بني سويف":["بني سويف"],"الواسطى":["الواسطى"],"ناصر":["ناصر"],"إهناسيا":["إهناسيا"],"ببا":["ببا"],"سمسطا":["سمسطا"],"الفشن":["الفشن"]},
+  "المنيا":{ "المنيا":["المنيا"],"العدوة":["العدوة"],"مغاغة":["مغاغة"],"بني مزار":["بني مزار"],"مطاي":["مطاي"],"سمالوط":["سمالوط"],"المنيا الجديدة":["المنيا الجديدة"],"أبو قرقاص":["أبو قرقاص"],"ملوي":["ملوي"],"دير مواس":["دير مواس"]},
+  "أسيوط":{ "أسيوط":["أسيوط"],"ديروط":["ديروط"],"منفلوط":["منفلوط"],"القوصية":["القوصية"],"أبنوب":["أبنوب"],"أبو تيج":["أبو تيج"],"الغنايم":["الغنايم"],"ساحل سليم":["ساحل سليم"],"البداري":["البداري"],"صدفا":["صدفا"]},
+  "سوهاج":{ "سوهاج":["سوهاج"],"أخميم":["أخميم"],"البلينا":["البلينا"],"المراغة":["المراغة"],"المنشأة":["المنشأة"],"دار السلام":["دار السلام"],"جرجا":["جرجا"],"جهينة":["جهينة"],"ساقلتة":["ساقلتة"],"طما":["طما"],"طهطا":["طهطا"],"العسيرات":["العسيرات"]},
+  "قنا":{ "قنا":["قنا"],"أبو تشت":["أبو تشت"],"نجع حمادي":["نجع حمادي"],"دشنا":["دشنا"],"الوقف":["الوقف"],"قفط":["قفط"],"قوص":["قوص"],"نقادة":["نقادة"],"فرشوط":["فرشوط"]},
+  "الأقصر":{ "الأقصر":["الأقصر"],"الأقصر الجديدة":["الأقصر الجديدة"],"إسنا":["إسنا"],"أرمنت":["أرمنت"],"الزينية":["الزينية"],"البياضية":["البياضية"],"القرنة":["القرنة"],"الطود":["الطود"]},
+  "أسوان":{ "أسوان":["أسوان"],"أسوان الجديدة":["أسوان الجديدة"],"دراو":["دراو"],"كوم أمبو":["كوم أمبو"],"نصر النوبة":["نصر النوبة"],"كلابشة":["كلابشة"],"إدفو":["إدفو"],"الرديسية":["الرديسية"],"البصيلية":["البصيلية"]},
+  "البحر الأحمر":{ "الغردقة":["الغردقة"],"رأس غارب":["رأس غارب"],"سفاجا":["سفاجا"],"القصير":["القصير"],"مرسى علم":["مرسى علم"],"الشلاتين":["الشلاتين"]},
+  "الوادي الجديد":{ "الخارجة":["الخارجة"],"الداخلة":["الداخلة"],"الفرافرة":["الفرافرة"],"باريس":["باريس"],"بلاط":["بلاط"]},
+  "مطروح":{ "مرسى مطروح":["مرسى مطروح"],"الحمام":["الحمام"],"العلمين":["العلمين"],"الضبعة":["الضبعة"],"سيدي براني":["سيدي براني"],"السلوم":["السلوم"],"سيوة":["سيوة"]},
+  "شمال سيناء":{ "العريش":["العريش"],"الشيخ زويد":["الشيخ زويد"],"رفح":["رفح"],"بئر العبد":["بئر العبد"],"الحسنة":["الحسنة"],"نخل":["نخل"]},
+  "جنوب سيناء":{ "الطور":["الطور"],"شرم الشيخ":["شرم الشيخ"],"دهب":["دهب"],"نويبع":["نويبع"],"طابا":["طابا"],"سانت كاترين":["سانت كاترين"],"أبو رديس":["أبو رديس"],"رأس سدر":["رأس سدر"]}
+};
+
+/* تعبئة المحافظات */
+const govSel=document.getElementById('gov'),citySel=document.getElementById('city'),markazSel=document.getElementById('markaz');
+Object.keys(EGYPT).forEach(g=>{const o=document.createElement('option');o.value=o.textContent=g;govSel.appendChild(o);});
+
+govSel.addEventListener('change',()=>{
+  citySel.innerHTML='<option value="">— اختر المدينة —</option>';
+  markazSel.innerHTML='<option value="">— اختر المدينة أولاً —</option>';
+  const g=govSel.value;if(!g)return;
+  Object.keys(EGYPT[g]).forEach(c=>{const o=document.createElement('option');o.value=o.textContent=c;citySel.appendChild(o);});
+});
+citySel.addEventListener('change',()=>{
+  markazSel.innerHTML='<option value="">— اختر المركز / الحي —</option>';
+  const g=govSel.value,c=citySel.value;if(!g||!c)return;
+  EGYPT[g][c].forEach(m=>{const o=document.createElement('option');o.value=o.textContent=m;markazSel.appendChild(o);});
+});
+
+/* ---------- اللوكيشن ---------- */
+let geo={lat:"",lng:""};
+function getLocation(){
+  const btn=document.getElementById('locBtn'),info=document.getElementById('locInfo');
+  if(!navigator.geolocation){info.textContent="الجهاز لا يدعم تحديد الموقع";return;}
+  btn.innerHTML='<span class="spin"></span> جاري تحديد الموقع...';
+  navigator.geolocation.getCurrentPosition(p=>{
+    geo.lat=p.coords.latitude.toFixed(6);geo.lng=p.coords.longitude.toFixed(6);
+    btn.classList.add('done');btn.innerHTML='✓ تم تسجيل اللوكيشن';
+    const url=`https://www.google.com/maps?q=${geo.lat},${geo.lng}`;
+    info.innerHTML=`الإحداثيات: ${geo.lat}, ${geo.lng} — <a href="${url}" target="_blank">افتح في الخريطة</a>`;
+  },err=>{
+    btn.innerHTML='📍 تسجيل اللوكيشن الحالي';
+    info.textContent="تعذّر تحديد الموقع: "+(err.code===1?"لازم تسمح بالوصول للموقع":"حاول مرة أخرى");
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+}
+
+/* ---------- الصورة ---------- */
+let imgData="";
+function handleImage(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    // ضغط الصورة لتقليل الحجم قبل الرفع
+    const img=new Image();
+    img.onload=()=>{
+      const max=1100;let{width:w,height:h}=img;
+      if(w>max||h>max){if(w>h){h=h*max/w;w=max;}else{w=w*max/h;h=max;}}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      imgData=c.toDataURL('image/jpeg',0.75);
+      document.getElementById('imgTag').src=imgData;
+      document.getElementById('imgPreview').style.display='block';
+      document.getElementById('imgBtn').classList.add('done');
+      document.getElementById('imgBtn').innerHTML='✓ تم اختيار الصورة (اضغط للتغيير)';
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function removeImage(){
+  imgData="";document.getElementById('imgInput').value="";
+  document.getElementById('imgPreview').style.display='none';
+  document.getElementById('imgBtn').classList.remove('done');
+  document.getElementById('imgBtn').innerHTML='📷 التقاط / اختيار صورة الكارت';
+}
+
+/* ---------- الإرسال ---------- */
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.className='toast show'+(type?' '+type:'');t.innerHTML=msg;
+  if(type!=='loading')setTimeout(()=>t.classList.remove('show'),3500);
+}
+function getChecked(){return [...document.querySelectorAll('#traderType input:checked')].map(c=>c.value).join('، ');}
+
+function submitForm(){
+  const shop=document.getElementById('shopName').value.trim();
+  const person=document.getElementById('personName').value.trim();
+  const phone1=document.getElementById('phone1').value.trim();
+  if(!shop){toast('من فضلك اكتب اسم المحل','err');return;}
+  if(!person){toast('من فضلك اكتب اسم المسؤول','err');return;}
+  if(!phone1){toast('من فضلك اكتب تليفون المسؤول','err');return;}
+
+  const glassEl=document.querySelector('input[name=glass]:checked');
+  const data={
+    "اسم المحل":shop,
+    "اسم المسؤول":person,
+    "تليفون المسؤول":phone1,
+    "تليفون 2":document.getElementById('phone2').value.trim(),
+    "تليفونات أخرى":document.getElementById('phoneOther').value.trim(),
+    "المحافظة":govSel.value,
+    "المدينة":citySel.value,
+    "المركز/الحي":markazSel.value,
+    "العنوان التفصيلي":document.getElementById('address').value.trim(),
+    "Latitude":geo.lat,
+    "Longitude":geo.lng,
+    "رابط الخريطة":geo.lat?`https://www.google.com/maps?q=${geo.lat},${geo.lng}`:"",
+    "تصنيف التاجر":getChecked(),
+    "يحتاج زجاج":glassEl?glassEl.value:"",
+    "حجم شركتنا لدى التاجر":document.getElementById('ourSize').value,
+    "المنافس الأول":document.getElementById('comp1').value.trim(),
+    "المنافس الثاني":document.getElementById('comp2').value.trim(),
+    "ملاحظات هامة":document.getElementById('notes').value.trim(),
+    "image":imgData
+  };
+
+  if(SCRIPT_URL.includes("ضع_رابط")){
+    toast('⚠️ لازم تحط رابط Google Script أولاً','err');return;
+  }
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري الحفظ...';
+  toast('<span class="spin"></span> جاري إرسال البيانات...','loading');
+
+  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(data)})
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status==='success'){
+      toast('✓ تم حفظ بيانات العميل بنجاح','ok');
+      resetForm();
+    }else{throw new Error(res.message||'خطأ');}
+  })
+  .catch(e=>{toast('حصل خطأ أثناء الحفظ، حاول تاني','err');console.error(e);})
+  .finally(()=>{btn.disabled=false;btn.innerHTML='💾 حفظ البيانات على Google Sheet';});
+}
+
+function resetForm(){
+  document.querySelectorAll('input[type=text],input[type=tel],textarea').forEach(i=>i.value='');
+  document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
+  citySel.innerHTML='<option value="">— اختر المحافظة أولاً —</option>';
+  markazSel.innerHTML='<option value="">— اختر المدينة أولاً —</option>';
+  document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(c=>c.checked=false);
+  geo={lat:"",lng:""};
+  document.getElementById('locBtn').classList.remove('done');
+  document.getElementById('locBtn').innerHTML='📍 تسجيل اللوكيشن الحالي';
+  document.getElementById('locInfo').textContent='اضغط الزر وانت واقف عند المحل لتسجيل الإحداثيات';
+  removeImage();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
