@@ -215,7 +215,7 @@
     </div>
     <div class="row">
       <div class="field">
-        <label for="city">المدينة</label>
+        <label class="req" for="city">المدينة</label>
         <select id="city"><option value="">— اختر المحافظة أولاً —</option></select>
       </div>
       <div class="field">
@@ -224,7 +224,7 @@
       </div>
     </div>
     <div class="field">
-      <label for="address">العنوان بالتفصيل وعلامات مميزة</label>
+      <label class="req" for="address">العنوان بالتفصيل وعلامات مميزة</label>
       <textarea id="address" placeholder="الشارع، رقم العقار، وأقرب علامة مميزة بجوار المكان"></textarea>
     </div>
   </div>
@@ -268,7 +268,7 @@
 
   <!-- التصنيف -->
   <div class="card">
-    <h2><span class="n">7</span> تصنيف التاجر</h2>
+    <h2><span class="n">7</span> تصنيف التاجر <span style="color:var(--err);font-size:13px;">*</span></h2>
     <div class="chips" id="traderType">
       <div class="chip"><input type="checkbox" id="t1" value="جملة"><label for="t1">جملة</label></div>
       <div class="chip"><input type="checkbox" id="t2" value="تجزئة - فئة عالية"><label for="t2">تجزئة - فئة عالية</label></div>
@@ -283,7 +283,7 @@
     <h2><span class="n">8</span> بيانات تجارية</h2>
 
     <div class="field">
-      <label>التاجر يحتاج زجاج؟</label>
+      <label class="req">التاجر يحتاج زجاج؟</label>
       <div class="chips gold">
         <div class="chip gold"><input type="radio" name="glass" id="g1" value="نعم"><label for="g1">نعم</label></div>
         <div class="chip gold"><input type="radio" name="glass" id="g2" value="لا"><label for="g2">لا</label></div>
@@ -506,10 +506,17 @@ function submitForm(){
   if(!person){toast('من فضلك اكتب اسم المسؤول في المحل','err');return;}
   if(!phone1){toast('من فضلك اكتب تليفون المسؤول','err');return;}
   if(!/^\d{11}$/.test(phone1)){toast('تليفون المسؤول لابد أن يكون 11 رقم','err');checkPhone();document.getElementById('phone1').focus();return;}
+  const city=document.getElementById('city').value;
+  if(!city){toast('من فضلك اختر المدينة','err');return;}
+  const address=document.getElementById('address').value.trim();
+  if(!address){toast('من فضلك اكتب العنوان بالتفصيل','err');return;}
+  const traderType=getChecked();
+  if(!traderType){toast('من فضلك اختر تصنيف التاجر','err');return;}
+  const glassEl=document.querySelector('input[name=glass]:checked');
+  if(!glassEl){toast('من فضلك حدد إذا كان التاجر يحتاج زجاج','err');return;}
   const ourSize=document.getElementById('ourSize').value;
   if(!ourSize){toast('من فضلك اختر حجم شركتنا لدى التاجر','err');return;}
 
-  const glassEl=document.querySelector('input[name=glass]:checked');
   const data={
     "مسؤول المبيعات":salesRep,
     "اسم المحل":shop,
@@ -524,12 +531,12 @@ function submitForm(){
     "المحافظة":govSel.value,
     "المدينة":citySel.value,
     "المركز/الحي":markazSel.value,
-    "العنوان التفصيلي":document.getElementById('address').value.trim(),
+    "العنوان التفصيلي":address,
     "Latitude":geo.lat,
     "Longitude":geo.lng,
     "رابط الخريطة":geo.lat?`https://www.google.com/maps?q=${geo.lat},${geo.lng}`:document.getElementById('mapLink').value.trim(),
-    "تصنيف التاجر":getChecked(),
-    "يحتاج زجاج":glassEl?glassEl.value:"",
+    "تصنيف التاجر":traderType,
+    "يحتاج زجاج":glassEl.value,
     "حجم شركتنا لدى التاجر":ourSize,
     "المنافس الأول":document.getElementById('comp1').value.trim(),
     "المنافس الثاني":document.getElementById('comp2').value.trim(),
