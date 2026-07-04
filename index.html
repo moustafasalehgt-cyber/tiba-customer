@@ -67,6 +67,9 @@
   .row{display:flex;gap:12px;flex-wrap:wrap;}
   .row .field{flex:1;min-width:140px;}
   .hint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+  .err-msg{display:none;font-size:12px;color:var(--err);margin-top:5px;font-weight:600;}
+  .err-msg.show{display:block;}
+  input.invalid{border-color:var(--err);box-shadow:0 0 0 3px rgba(192,57,43,.15);}
 
   /* checkboxes / radios as chips */
   .chips{display:flex;flex-wrap:wrap;gap:9px;}
@@ -158,8 +161,8 @@
   <div class="card">
     <h2><span class="n">2</span> بيانات المحل والمسؤول</h2>
     <div class="field">
-      <label class="req" for="shopName">اسم المحل</label>
-      <input type="text" id="shopName" placeholder="اكتب اسم المحل">
+      <label class="req" for="shopName">اسم المحل المكتوب على اللافتة</label>
+      <input type="text" id="shopName" placeholder="الاسم كما هو مكتوب على لافتة المحل">
     </div>
     <div class="field">
       <label class="req" for="personName">اسم الشخص المسؤول في المحل</label>
@@ -168,7 +171,8 @@
     <div class="row">
       <div class="field">
         <label class="req" for="phone1">تليفون المسؤول</label>
-        <input type="tel" id="phone1" placeholder="01xxxxxxxxx" inputmode="tel">
+        <input type="tel" id="phone1" placeholder="01xxxxxxxxx" inputmode="numeric" maxlength="11" onblur="checkPhone()" oninput="clearPhoneErr()">
+        <div class="err-msg" id="phone1Err">الرقم لابد أن يكون 11 رقم</div>
       </div>
       <div class="field">
         <label for="phone2">تليفون 2 للمسؤول</label>
@@ -181,9 +185,30 @@
     </div>
   </div>
 
+  <!-- روابط التواصل الاجتماعي -->
+  <div class="card">
+    <h2><span class="n">3</span> روابط التواصل الاجتماعي</h2>
+    <div class="field">
+      <label for="fb">فيسبوك</label>
+      <input type="text" id="fb" placeholder="رابط أو اسم الصفحة" dir="ltr" style="text-align:left;">
+    </div>
+    <div class="field">
+      <label for="insta">إنستجرام</label>
+      <input type="text" id="insta" placeholder="رابط أو اسم الحساب" dir="ltr" style="text-align:left;">
+    </div>
+    <div class="field">
+      <label for="tiktok">تيك توك</label>
+      <input type="text" id="tiktok" placeholder="رابط أو اسم الحساب" dir="ltr" style="text-align:left;">
+    </div>
+    <div class="field">
+      <label for="otherLink">رابط آخر</label>
+      <input type="text" id="otherLink" placeholder="أي رابط إضافي (متجر، موقع، واتساب...)" dir="ltr" style="text-align:left;">
+    </div>
+  </div>
+
   <!-- الموقع الجغرافي -->
   <div class="card">
-    <h2><span class="n">3</span> المحافظة والمنطقة</h2>
+    <h2><span class="n">4</span> المحافظة والمنطقة</h2>
     <div class="field">
       <label class="req" for="gov">المحافظة</label>
       <select id="gov"><option value="">— اختر المحافظة —</option></select>
@@ -206,7 +231,7 @@
 
   <!-- اللوكيشن -->
   <div class="card">
-    <h2><span class="n">4</span> لوكيشن العميل على الخريطة</h2>
+    <h2><span class="n">5</span> لوكيشن العميل على الخريطة</h2>
     <button type="button" class="btn btn-loc" id="locBtn" onclick="getLocation()">
       📍 تسجيل اللوكيشن الحالي
     </button>
@@ -220,11 +245,21 @@
 
   <!-- صورة الكارت -->
   <div class="card">
-    <h2><span class="n">5</span> صورة كارت المحل</h2>
-    <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImage(event)">
-    <button type="button" class="btn btn-img" id="imgBtn" onclick="document.getElementById('imgInput').click()">
-      📷 صورة الكارت (كاميرا أو جاليري)
-    </button>
+    <h2><span class="n">6</span> صورة كارت المحل</h2>
+    <input type="file" id="imgCam" accept="image/*" capture="environment" style="display:none" onchange="handleImage(event)">
+    <input type="file" id="imgGal" accept="image/*" style="display:none" onchange="handleImage(event)">
+    <div class="row">
+      <div class="field" style="margin-bottom:0;">
+        <button type="button" class="btn btn-img" id="imgBtnCam" onclick="document.getElementById('imgCam').click()">
+          📷 تصوير بالكاميرا
+        </button>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <button type="button" class="btn btn-img" id="imgBtnGal" onclick="document.getElementById('imgGal').click()">
+          🖼️ اختيار من الجاليري
+        </button>
+      </div>
+    </div>
     <div id="imgPreview">
       <img id="imgTag" alt="معاينة الكارت">
       <div><button type="button" class="removeImg" onclick="removeImage()">✕ حذف الصورة</button></div>
@@ -233,7 +268,7 @@
 
   <!-- التصنيف -->
   <div class="card">
-    <h2><span class="n">6</span> تصنيف التاجر</h2>
+    <h2><span class="n">7</span> تصنيف التاجر</h2>
     <div class="chips" id="traderType">
       <div class="chip"><input type="checkbox" id="t1" value="جملة"><label for="t1">جملة</label></div>
       <div class="chip"><input type="checkbox" id="t2" value="تجزئة - فئة عالية"><label for="t2">تجزئة - فئة عالية</label></div>
@@ -245,7 +280,7 @@
 
   <!-- بيانات تجارية -->
   <div class="card">
-    <h2><span class="n">7</span> بيانات تجارية</h2>
+    <h2><span class="n">8</span> بيانات تجارية</h2>
 
     <div class="field">
       <label>التاجر يحتاج زجاج؟</label>
@@ -256,7 +291,7 @@
     </div>
 
     <div class="field">
-      <label for="ourSize">حجم شركتنا بالنسبة للشركات الأخرى لدى التاجر</label>
+      <label class="req" for="ourSize">حجم شركتنا بالنسبة للشركات الأخرى لدى التاجر</label>
       <select id="ourSize">
         <option value="">— اختر —</option>
         <option>المورد الأساسي (الأكبر)</option>
@@ -281,7 +316,7 @@
 
   <!-- ملاحظات هامة -->
   <div class="card">
-    <h2><span class="n">8</span> ملاحظات هامة</h2>
+    <h2><span class="n">9</span> ملاحظات هامة</h2>
     <div class="field">
       <label for="notes">ملاحظات عن العميل</label>
       <textarea id="notes" placeholder="أي ملاحظة مهمة عن التاجر أو التعامل معه" style="min-height:90px;"></textarea>
@@ -304,7 +339,7 @@
 /* ====================================================================
    ضع هنا رابط الـ Web App بعد نشر Google Apps Script (موضح في الخطوات)
    ==================================================================== */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtYgthXcd2rtRDnDbCI1Ic_Qzrd5mmLIf_qnnRzR7ou1ItxlY2ZDMmoYuuawKkv73s/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzkd5cnTEREUg6WQwpoiOo6qBurGZmZ-MLBOx7SiE4oVNmGEgFJSBzc0_7AjD--ZZQhaA/exec";
 
 /* ---------- بيانات المحافظات والمدن والمراكز ---------- */
 const EGYPT = {
@@ -392,18 +427,20 @@ function handleImage(e){
       imgData=c.toDataURL('image/jpeg',0.75);
       document.getElementById('imgTag').src=imgData;
       document.getElementById('imgPreview').style.display='block';
-      document.getElementById('imgBtn').classList.add('done');
-      document.getElementById('imgBtn').innerHTML='✓ تم اختيار الصورة (اضغط للتغيير)';
+      document.getElementById('imgBtnCam').classList.add('done');
+      document.getElementById('imgBtnGal').classList.add('done');
     };
     img.src=ev.target.result;
   };
   reader.readAsDataURL(f);
 }
 function removeImage(){
-  imgData="";document.getElementById('imgInput').value="";
+  imgData="";
+  document.getElementById('imgCam').value="";
+  document.getElementById('imgGal').value="";
   document.getElementById('imgPreview').style.display='none';
-  document.getElementById('imgBtn').classList.remove('done');
-  document.getElementById('imgBtn').innerHTML='📷 صورة الكارت (كاميرا أو جاليري)';
+  document.getElementById('imgBtnCam').classList.remove('done');
+  document.getElementById('imgBtnGal').classList.remove('done');
 }
 
 /* ---------- الإرسال ---------- */
@@ -414,6 +451,30 @@ function toast(msg,type){
 }
 function getChecked(){return [...document.querySelectorAll('#traderType input:checked')].map(c=>c.value).join('، ');}
 
+function checkPhone(){
+  const el=document.getElementById('phone1');
+  const err=document.getElementById('phone1Err');
+  const v=el.value.trim();
+  // نقبل الأرقام فقط ولابد أن تكون 11 رقم بالظبط
+  if(v!=="" && !/^\d{11}$/.test(v)){
+    el.classList.add('invalid');
+    err.classList.add('show');
+    return false;
+  }
+  el.classList.remove('invalid');
+  err.classList.remove('show');
+  return true;
+}
+function clearPhoneErr(){
+  // امنع إدخال أي حرف غير رقم
+  const el=document.getElementById('phone1');
+  el.value=el.value.replace(/\D/g,'');
+  if(/^\d{11}$/.test(el.value.trim())){
+    el.classList.remove('invalid');
+    document.getElementById('phone1Err').classList.remove('show');
+  }
+}
+
 function submitForm(){
   const salesRep=document.getElementById('salesRep').value;
   const shop=document.getElementById('shopName').value.trim();
@@ -423,6 +484,9 @@ function submitForm(){
   if(!shop){toast('من فضلك اكتب اسم المحل','err');return;}
   if(!person){toast('من فضلك اكتب اسم المسؤول في المحل','err');return;}
   if(!phone1){toast('من فضلك اكتب تليفون المسؤول','err');return;}
+  if(!/^\d{11}$/.test(phone1)){toast('تليفون المسؤول لابد أن يكون 11 رقم','err');checkPhone();document.getElementById('phone1').focus();return;}
+  const ourSize=document.getElementById('ourSize').value;
+  if(!ourSize){toast('من فضلك اختر حجم شركتنا لدى التاجر','err');return;}
 
   const glassEl=document.querySelector('input[name=glass]:checked');
   const data={
@@ -432,6 +496,10 @@ function submitForm(){
     "تليفون المسؤول":phone1,
     "تليفون 2":document.getElementById('phone2').value.trim(),
     "تليفونات أخرى":document.getElementById('phoneOther').value.trim(),
+    "فيسبوك":document.getElementById('fb').value.trim(),
+    "إنستجرام":document.getElementById('insta').value.trim(),
+    "تيك توك":document.getElementById('tiktok').value.trim(),
+    "رابط آخر":document.getElementById('otherLink').value.trim(),
     "المحافظة":govSel.value,
     "المدينة":citySel.value,
     "المركز/الحي":markazSel.value,
@@ -441,7 +509,7 @@ function submitForm(){
     "رابط الخريطة":geo.lat?`https://www.google.com/maps?q=${geo.lat},${geo.lng}`:document.getElementById('mapLink').value.trim(),
     "تصنيف التاجر":getChecked(),
     "يحتاج زجاج":glassEl?glassEl.value:"",
-    "حجم شركتنا لدى التاجر":document.getElementById('ourSize').value,
+    "حجم شركتنا لدى التاجر":ourSize,
     "المنافس الأول":document.getElementById('comp1').value.trim(),
     "المنافس الثاني":document.getElementById('comp2').value.trim(),
     "ملاحظات هامة":document.getElementById('notes').value.trim(),
